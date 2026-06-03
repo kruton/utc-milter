@@ -1,0 +1,19 @@
+#!/sbin/openrc-run
+
+name="utc-milter"
+description="Postfix milter that normalizes Date headers to UTC"
+
+command="/usr/sbin/utc-milter"
+command_args="${utc_milter_args}"
+command_background="yes"
+pidfile="/run/utc-milter/utc-milter.pid"
+directory="/"
+
+depend() {
+	need net
+	before postfix
+}
+
+start_pre() {
+	checkpath --directory --mode 0755 /run/utc-milter
+}

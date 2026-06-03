@@ -1,0 +1,11 @@
+pre-commit:
+  parallel: true
+  commands:
+    go-test:
+      run: go test ./...
+    go-vet:
+      run: go vet ./...
+    go-build:
+      run: go build -o /tmp/utc-milter ./cmd/utc-milter
+    actionlint:
+      run: actionlint

@@ -1,0 +1,2 @@
+# Additional arguments passed to utc-milter.
+utc_milter_args="--network unix --socket /run/utc-milter/utc-milter.sock --socket-mode 0660 --socket-group postfix"

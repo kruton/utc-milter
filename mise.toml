@@ -1,0 +1,6 @@
+[tools]
+actionlint = "1.7.12"
+lefthook = "2.1.9"
+
+[env]
+CGO_ENABLED = "0"
