@@ -100,16 +100,22 @@ jobs:
               sudo -u builder abuild checksum
               sudo -u builder abuild -r
 
-              arch="$(apk --print-arch)"
-              mkdir -p /work/dist/apks "/work/dist/repo/${arch}"
+              mkdir -p /work/dist/apks /work/dist/repo
+              cp -r /home/builder/packages/packaging/* /work/dist/repo/
               find /home/builder/packages -name "*.apk" -exec cp -v {} /work/dist/apks/ \;
-              cp -v /work/dist/apks/*.apk "/work/dist/repo/${arch}/"
               cp -v /home/builder/.abuild/utc-milter.rsa.pub /work/dist/repo/utc-milter.rsa.pub
               chown -R builder:builder /work/dist
 
               sudo -u builder sh -euxc "
-                cd /work/dist/repo/${arch}
+                cd /work/dist/repo/noarch
                 apk index -o APKINDEX.tar.gz *.apk
+                abuild-sign APKINDEX.tar.gz
+              "
+
+              arch="$(apk --print-arch)"
+              sudo -u builder sh -euxc "
+                cd /work/dist/repo/${arch}
+                apk index -o APKINDEX.tar.gz *.apk /work/dist/repo/noarch/*.apk
                 abuild-sign APKINDEX.tar.gz
               "
             '
