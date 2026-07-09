@@ -78,6 +78,10 @@ jobs:
               chmod 0600 /home/builder/.abuild/abuild.conf
               cp /home/builder/.abuild/utc-milter.rsa.pub /etc/apk/keys/
 
+              if echo "${GITHUB_REF_NAME}" | grep -qE '^v[0-9]+\.[0-9]+\.[0-9]+'; then
+                sed -i "s/^pkgver=.*/pkgver=${GITHUB_REF_NAME#v}/" packaging/alpine/APKBUILD
+              fi
+
               pkgver="$(sed -n "s/^pkgver=//p" packaging/alpine/APKBUILD)"
               pkgname="$(sed -n "s/^pkgname=//p" packaging/alpine/APKBUILD)"
               tarball="/var/cache/distfiles/${pkgname}-${pkgver}.tar.gz"
@@ -92,7 +96,7 @@ jobs:
               install -m 0644 packaging/alpine/utc-milter.confd /var/cache/distfiles/utc-milter.confd
 
               cd packaging/alpine
-              sudo -u builder sed -i "s#${pkgname}-${pkgver}.tar.gz::https://github.com/kruton/utc-milter/archive/refs/tags/v\$pkgver.tar.gz#${pkgname}-${pkgver}.tar.gz#" APKBUILD
+              sudo -u builder sed -i "s#\\\$pkgname-\\\$pkgver.tar.gz::https://github.com/kruton/utc-milter/archive/refs/tags/v\\\$pkgver.tar.gz#\\\$pkgname-\\\$pkgver.tar.gz#" APKBUILD
               sudo -u builder abuild checksum
               sudo -u builder abuild -r
 
