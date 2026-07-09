@@ -190,4 +190,4 @@ jobs:
       - name: Deploy Alpine repository
         if: steps.semver.outputs.valid == 'true'
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
