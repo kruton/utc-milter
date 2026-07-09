@@ -101,7 +101,9 @@ jobs:
               sudo -u builder abuild -r
 
               mkdir -p /work/dist/apks /work/dist/repo
-              cp -r /home/builder/packages/packaging/* /work/dist/repo/
+              cd /home/builder/packages/packaging
+              tar -cf - . | tar -C /work/dist/repo/ -xf -
+              cd /work
               find /home/builder/packages -name "*.apk" -exec cp -v {} /work/dist/apks/ \;
               cp -v /home/builder/.abuild/utc-milter.rsa.pub /work/dist/repo/utc-milter.rsa.pub
               chown -R builder:builder /work/dist
