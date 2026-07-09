@@ -94,9 +94,9 @@ jobs:
               tar -tzf "${tarball}" | grep -qx "${pkgname}-${pkgver}/cmd/utc-milter/main.go"
               install -m 0644 packaging/alpine/utc-milter.initd /var/cache/distfiles/utc-milter.initd
               install -m 0644 packaging/alpine/utc-milter.confd /var/cache/distfiles/utc-milter.confd
+              chown -R builder:builder /var/cache/distfiles
 
               cd packaging/alpine
-              sudo -u builder sed -i "s#\\\$pkgname-\\\$pkgver.tar.gz::https://github.com/kruton/utc-milter/archive/refs/tags/v\\\$pkgver.tar.gz#\\\$pkgname-\\\$pkgver.tar.gz#" APKBUILD
               sudo -u builder abuild checksum
               sudo -u builder abuild -r
 
