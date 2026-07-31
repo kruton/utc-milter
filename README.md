@@ -16,6 +16,10 @@ Date: Wed, 03 Jun 2026 19:34:56 +0000
 If a message has no `Date` header, or the existing `Date` header cannot be
 parsed, utc-milter sets it using the current UTC time.
 
+Messages containing an existing `DKIM-Signature` header that signs the `Date`
+header (listed in the `h=` tag) are left unchanged to avoid invalidating
+pre-signed DKIM signatures on inbound or relayed mail.
+
 ## Build
 
 Go 1.25 or newer is required by the milter library dependency.
@@ -58,7 +62,7 @@ utc-milter --network tcp --socket 127.0.0.1:8899
 ## Postfix
 
 Attach utc-milter only to outbound mail paths, such as submission or an
-outbound-only Postfix instance. The daemon rewrites every message it receives.
+outbound-only Postfix instance. The daemon rewrites non-DKIM-signed messages it receives.
 
 Example `main.cf` fragment for a local Unix socket:
 

@@ -8,6 +8,7 @@ import (
 	"os/user"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/d--j/go-milter/mailfilter"
@@ -90,6 +91,9 @@ func (cfg Config) withDefaults() Config {
 
 func utcDateDecision(now func() time.Time) mailfilter.DecisionModificationFunc {
 	return func(_ context.Context, trx mailfilter.Trx) (mailfilter.Decision, error) {
+		if hasDKIMSignedDate(trx) {
+			return mailfilter.Accept, nil
+		}
 		headers := trx.Headers()
 		if headers.Value("Date") == "" {
 			headers.SetDate(now().UTC())
@@ -104,6 +108,45 @@ func utcDateDecision(now func() time.Time) mailfilter.DecisionModificationFunc {
 		headers.SetDate(date.UTC())
 		return mailfilter.Accept, nil
 	}
+}
+
+func hasDKIMSignedDate(trx mailfilter.Trx) bool {
+	fields := trx.Headers().Fields()
+	for fields.Next() {
+		if fields.IsDeleted() {
+			continue
+		}
+		if strings.EqualFold(fields.Key(), "DKIM-Signature") {
+			if dkimSignsHeader(fields.Value(), "date") {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func dkimSignsHeader(sig, targetHeader string) bool {
+	for _, part := range strings.Split(sig, ";") {
+		part = strings.TrimSpace(part)
+		key, val, ok := strings.Cut(part, "=")
+		if !ok {
+			continue
+		}
+		if strings.TrimSpace(key) == "h" {
+			for _, h := range strings.Split(val, ":") {
+				cleanH := strings.Map(func(r rune) rune {
+					if r == ' ' || r == '\t' || r == '\n' || r == '\r' {
+						return -1
+					}
+					return r
+				}, h)
+				if strings.EqualFold(cleanH, targetHeader) {
+					return true
+				}
+			}
+		}
+	}
+	return false
 }
 
 func prepareUnixSocket(path string) error {
