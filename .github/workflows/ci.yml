@@ -73,7 +73,7 @@ jobs:
               install -m 0644 utc-milter.rsa.pub /home/builder/.abuild/utc-milter.rsa.pub
               chown builder:builder /home/builder/.abuild/utc-milter.rsa /home/builder/.abuild/utc-milter.rsa.pub
               chmod 0600 /home/builder/.abuild/utc-milter.rsa
-              printf "PACKAGER_PRIVKEY=/home/builder/.abuild/utc-milter.rsa\n" > /home/builder/.abuild/abuild.conf
+              printf "PACKAGER_PRIVKEY=/home/builder/.abuild/utc-milter.rsa\nREPODEST=/home/builder/packages\n" > /home/builder/.abuild/abuild.conf
               chown builder:builder /home/builder/.abuild/abuild.conf
               chmod 0600 /home/builder/.abuild/abuild.conf
               cp /home/builder/.abuild/utc-milter.rsa.pub /etc/apk/keys/
